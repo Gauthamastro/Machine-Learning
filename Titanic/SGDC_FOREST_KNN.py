@@ -8,11 +8,8 @@ def read_data(x):
 def preprocessing(x):
     ti = read_data(x)
     #Removing Non needed data
-    ti.drop('Cabin', axis=1, inplace=True)
-    ti.drop('PassengerId', axis=1, inplace=True)
-    ti.drop('Name', axis=1, inplace=True)
-    ti.drop('Ticket', axis=1, inplace=True)
-    #print(ti.head())
+    drop_col = ['Cabin','PassengerId','Name','Ticket']
+    ti.drop(drop_col, axis=1, inplace=True)
     #Converting text to number for better perf in training
     ti.loc[ti['Sex'] == 'male', 'Sex'] = 1
     ti.loc[ti['Sex'] == 'female', 'Sex'] = 0
@@ -29,15 +26,7 @@ def preprocessing(x):
     imputer.fit(ti)
     x = imputer.transform(ti)
     ti_trans = pd.DataFrame(x,columns= ti.columns)
-    #Scaling the data
-    
-    #Not actually preprocessing
-    #Finding Correlations between values
-    #ti_correc_matrix = ti_trans.corr()
-    #print(ti_correc_matrix["Survived"].sort_values(ascending=False))
-    return ti_trans
-
-    
+    return ti_trans 
 
 #Prepping data
 df_train = preprocessing("data/train.csv")
@@ -51,7 +40,7 @@ print(df_train_data.head())
 print(df_train_label.head())
 #Trying different models
     
-def SGDC(df_train_data,df_train_label,df_test):
+def SGDC(df_train_data,df_train_label,df_test):  #Stochastic Gradient Descent Classifier
     from sklearn.linear_model import SGDClassifier
     from sklearn.model_selection import cross_val_score
     sgd_clf = SGDClassifier(random_state=42)
@@ -60,7 +49,7 @@ def SGDC(df_train_data,df_train_label,df_test):
     print("Predicting...")
     return sgd_clf.predict(df_test),cross_val_score(sgd_clf,df_train_data,df_train_label,cv=5,scoring='accuracy')
 
-def Knearest(df_train_data,df_train_label,df_test):
+def Knearest(df_train_data,df_train_label,df_test):  #K-Nearest Neighbor Classifier
     from sklearn.neighbors import KNeighborsClassifier
     from sklearn.model_selection import cross_val_score
     knn_clf = KNeighborsClassifier()
@@ -69,7 +58,7 @@ def Knearest(df_train_data,df_train_label,df_test):
     print("Prediciting...")
     return knn_clf.predict(df_test),cross_val_score(knn_clf,df_train_data,df_train_label,cv=5,scoring='accuracy')
 
-def RandomForest(df_train_data,df_train_label,df_test):
+def RandomForest(df_train_data,df_train_label,df_test): #Random Forest Classifier
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.model_selection import cross_val_score
     forest = RandomForestClassifier(random_state=42)
@@ -92,6 +81,8 @@ print("SGDC : ",score1)
 print("KNN : ",score2)
 print("Forest : ",score3)
 
+
+#Code for generating the kaggle-formatted file with predictions for their test dataset.
 
 df_id = read_data("data/test.csv")
 #Submission #1
