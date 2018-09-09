@@ -1,12 +1,7 @@
 import pandas as pd
 
-
-def read_data(x):
-    #Path of file 
-    return pd.read_csv(x)
-
 def preprocessing(x):
-    ti = read_data(x)
+    ti = pd.read_csv(x)
     #Removing Non needed data
     drop_col = ['Cabin','PassengerId','Name','Ticket']
     ti.drop(drop_col, axis=1, inplace=True)
@@ -67,19 +62,63 @@ def RandomForest(df_train_data,df_train_label,df_test): #Random Forest Classifie
     print("Prediciting...")
     return forest.predict(df_test),cross_val_score(forest,df_train_data,df_train_label,cv=5,scoring='accuracy')
     
-    
+
+def GradientBoostingClassifier(df_train_data,df_test_label,df_test):
+    from sklearn.ensemble import GradientBoostingClassifier
+    from sklearn.model_selection import cross_val_score
+    gbc = GradientBoostingClassifier(n_estimators =100,learning_rate=0.01,max_depth=1,random_state=42)
+    gbc.fit(df_train_data,df_test_label)
+    return gbc.predict(df_test),cross_val_score(gbc,df_train_data,df_test_label,cv=5,scoring='accuracy')
+
+
+def XGBoost(df_train_data,df_test_label,df_test):
+    from xgboost.sklearn import XGBClassifier
+    from sklearn.model_selection import cross_val_score
+    xgb = XGBClassifier(n_estimators =1000,learning_rate=0.01,max_depth=3,random_state=42)
+    xgb.fit(df_train_data,df_test_label)
+    return xgb.predict(df_test),cross_val_score(xgb,df_train_data,df_test_label,cv=5,scoring='accuracy')
+
+#from sklearn.model_selection import GridSearchCV
+#from sklearn.ensemble import GradientBoostingClassifier
+#gbct = GradientBoostingClassifier()
+#n_estimator =[100,200,500,1000]
+#learning_rates =[1,0.1,0.01]
+#max_depths=[1,3,5]
+#grid = GridSearchCV(estimator=gbct,param_grid=dict(n_estimators=n_estimator,learning_rate=learning_rates,max_depth=max_depths))
+#grid.fit(df_train_data,df_train_label)
+#print(grid)
+#print(grid.best_score_)
+#print(grid.best_estimator_.n_estimators)
+#print(grid.best_estimator_.learning_rate)
+#print(grid.best_estimator_.max_depth)
+
 print("Test #1  - SGDC")
 sgdc,score1 = SGDC(df_train_data,df_train_label,df_test)
 print("Test #2  - Knearest")
 knn,score2 = Knearest(df_train_data,df_train_label,df_test)
-
-#Going with Random Forest Classifier as it is showing to be better performing...
 print("Test #3  - RandomForest")
 rf,score3 = RandomForest(df_train_data,df_train_label,df_test)
+print("Test #4 - GradientBoostingClassifier")
+gbc,score4 = GradientBoostingClassifier(df_train_data,df_train_label,df_test)
+print("Test #5  - XGBoostClassifier")
+xgb,score5 = XGBoost(df_train_data,df_train_label,df_test)
+
+def mean(x):
+    k = 0
+    for i in x:
+        k = k + i
+    return (k/5)
 
 print("SGDC : ",score1)
+print("Mean accuracy : " ,mean(score1))
 print("KNN : ",score2)
+print("Mean accuracy : " ,mean(score2))
 print("Forest : ",score3)
+print("Mean accuracy : " ,mean(score3))
+print("GradientBoosting :",score4)
+print("Mean accuracy : " ,mean(score4))
+print("XGBoost: ",score5)
+print("Mean accuracy : " ,mean(score5))
 
 
 #Code for generating the kaggle-formatted file with predictions for their test dataset.
@@ -108,5 +147,22 @@ submission3 = pd.DataFrame({
 })
 
 submission3.to_csv("results_knn_gj.csv", index = False)
+
+#Submission #4
+submission4= pd.DataFrame({
+    "PassengerId": df_id["PassengerId"],
+    "Survived": gbc.astype(int)
+})
+
+submission4.to_csv("results_GBC.csv", index = False)
+
+#Submission #5
+submission5= pd.DataFrame({
+    "PassengerId": df_id["PassengerId"],
+    "Survived": xgb.astype(int)
+})
+
+submission5.to_csv("results_XGB.csv", index = False)
+
 
 
