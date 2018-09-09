@@ -14,4 +14,4 @@ and finally XGBoost
 
 I used the hyperparameter  voting= hard for voting classifier and i couldnt use soft mode as it spitted some unknown errors(that i dont understand) all over the place.!
 
-Now it has an accuracy of 77.46% B-)
+Now it has an accuracy of 78.94% B-)
