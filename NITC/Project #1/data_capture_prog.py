@@ -11,7 +11,7 @@ end_x = 800
 end_y = 550
 
 ##Listening to these keys only! and saved in this order
-KEYS = ['w','a','s','d','q']
+KEYS = ['w','s',75,77,'q','e']
 
 
 dataset = pd.DataFrame(columns=['filename','keys_pressed','mouse_data'])
@@ -25,7 +25,7 @@ for i in range(10):
 
 while(True):
     k_pressed = []
-    screen = ImageGrab.grab(bbox=(startx,start_y,end_x,end_y))
+    screen = ImageGrab.grab(bbox=(start_x,start_y,end_x,end_y))
     screen_np = np.array(screen)
     filename='data'+str(time.time())+ '.jpg'
     screen.save(filename)
