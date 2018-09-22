@@ -1,16 +1,31 @@
 import numpy as np
 from PIL import ImageGrab
-import cv2,keyboard,mouse,time
+import keyboard,mouse,time
 import pandas as pd
 
 
+'''Edit these variable accordingly'''
+start_x = 0
+start_y = 110
+end_x = 800
+end_y = 550
+
+##Listening to these keys only! and saved in this order
 KEYS = ['w','a','s','d','q']
+
+
 dataset = pd.DataFrame(columns=['filename','keys_pressed','mouse_data'])
 last = time.time()
-j = 0
+j = 0 #Frame count
+
+
+for i in range(10):
+            time.sleep(1)
+            print("Starting Frame Capture in ",10-i)
+
 while(True):
     k_pressed = []
-    screen = ImageGrab.grab(bbox=(0,110,800,640))
+    screen = ImageGrab.grab(bbox=(startx,start_y,end_x,end_y))
     screen_np = np.array(screen)
     filename='data'+str(time.time())+ '.jpg'
     screen.save(filename)
@@ -20,6 +35,9 @@ while(True):
             mouse.is_pressed(button='left'),mouse.is_pressed(button='middle'),mouse.is_pressed(button='right')]
     dataset.loc[j] = [[filename],k_pressed,mice]
     j = j +1
+
+    '''Press esc to pause the capture for 10 secs and
+       previous data in memory will recorded to disk also.'''
     if keyboard.is_pressed('Esc'):
         dataset.to_csv('dataset.csv',sep=',')
         print(j," Frames Done")
@@ -28,7 +46,9 @@ while(True):
             print("Continuing Frame Capture in ",10-i)
     print(j,'---loop took {} seconds'.format(time.time() - last))
     last = time.time()
-    
+
+
+#Just including these scancodes for other values if there is any prob with the KEYS   
 s_codes = {'a':30,
      'b':48,
      'c':46,
